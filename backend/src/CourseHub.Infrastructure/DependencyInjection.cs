@@ -2,7 +2,9 @@ using CourseHub.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using CourseHub.Application.Interfaces;
+using CourseHub.Application.Interfaces.Services;
+using CourseHub.Infrastructure.Services;
 namespace CourseHub.Infrastructure;
 
 public static class DependencyInjection
@@ -11,6 +13,9 @@ public static class DependencyInjection
     {
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        
+        services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
 
         return services;
     }
