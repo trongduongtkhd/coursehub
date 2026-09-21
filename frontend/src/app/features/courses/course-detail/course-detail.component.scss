@@ -28,3 +28,54 @@
   gap: var(--space-3);
   align-items: center;
 }
+.course-detail__rating {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.review-section {
+  max-width: 640px;
+  margin: var(--space-4) auto 0;
+}
+
+.review-form {
+  padding: var(--space-4);
+  background: var(--color-primary-light);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-5);
+}
+.review-form p {
+  margin: 0 0 var(--space-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+.review-form textarea {
+  width: 100%;
+  margin: var(--space-3) 0;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  resize: vertical;
+}
+
+.review-item {
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.review-item:last-child {
+  border-bottom: none;
+}
+.review-item__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-1);
+}
+.review-item small {
+  color: var(--color-text-muted);
+}

@@ -1,0 +1,16 @@
+.star-rating {
+  display: inline-flex;
+  gap: 2px;
+}
+.star {
+  font-size: 20px;
+  color: var(--color-border);
+  cursor: pointer;
+  transition: color 0.1s ease;
+}
+.star--filled {
+  color: var(--color-accent);
+}
+.star-rating--readonly .star {
+  cursor: default;
+}
