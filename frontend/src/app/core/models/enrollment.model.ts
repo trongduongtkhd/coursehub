@@ -5,4 +5,7 @@ export interface Enrollment {
   courseThumbnailUrl: string | null;
   instructorName: string;
   enrolledAt: string;
+  totalLessons: number;
+  completedLessons: number;
+  progressPercent: number;
 }
