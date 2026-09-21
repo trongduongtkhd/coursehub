@@ -1,9 +1,13 @@
 using CourseHub.Infrastructure;
 using CourseHub.Application;
+using CourseHub.Application.Interfaces.Services;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+
+using CourseHub.Infrastructure.Persistence;
+using CourseHub.Infrastructure.Persistence.Seed;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -67,5 +71,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+    await DbSeeder.SeedAsync(context, passwordHasher);
+}
 app.Run();
