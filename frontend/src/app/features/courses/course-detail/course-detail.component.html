@@ -1,27 +1,39 @@
-<div class="page-container">
-  <p *ngIf="loading">Đang tải...</p>
-  <div *ngIf="notFound" class="empty-state">Không tìm thấy khóa học.</div>
+<p *ngIf="loading">Đang tải...</p>
+<div *ngIf="notFound" class="empty-state">Không tìm thấy khóa học.</div>
 
-  <div *ngIf="course" class="card course-detail">
-    <div class="course-detail__header">
-      <h2>{{ course.title }}</h2>
-      <span class="badge" [ngClass]="'badge-' + course.status.toLowerCase()">{{
-        course.status
-      }}</span>
-    </div>
-    <p class="course-detail__instructor">
-      Giảng viên: {{ course.instructorName }}
-    </p>
-    <p class="course-detail__description">{{ course.description }}</p>
+<div *ngIf="course" class="card course-detail">
+  <div class="course-detail__header">
+    <h2>{{ course.title }}</h2>
+    <span class="badge" [ngClass]="'badge-' + course.status.toLowerCase()">{{
+      course.status
+    }}</span>
+  </div>
+  <p class="course-detail__instructor">
+    Giảng viên: {{ course.instructorName }}
+  </p>
+  <p class="course-detail__description">{{ course.description }}</p>
 
-    <div class="course-detail__actions">
-      <a
-        *ngIf="canEdit"
-        [routerLink]="['/courses', course.id, 'edit']"
-        class="btn-primary"
-        >Sửa khóa học</a
-      >
-      <a routerLink="/courses" class="btn-secondary">← Quay lại danh sách</a>
-    </div>
+  <p *ngIf="enrollError" class="error-message">{{ enrollError }}</p>
+  <p *ngIf="enrolled" class="success-message">
+    Đăng ký thành công! Khóa học đã có trong "Khóa học của tôi".
+  </p>
+
+  <div class="course-detail__actions">
+    <button
+      type="button"
+      class="btn-primary"
+      *ngIf="canEnroll"
+      [disabled]="enrolling"
+      (click)="onEnroll()"
+    >
+      {{ enrolling ? "Đang đăng ký..." : "Đăng ký khóa học" }}
+    </button>
+    <a
+      *ngIf="canEdit"
+      [routerLink]="['/courses', course.id, 'edit']"
+      class="btn-secondary"
+      >Sửa khóa học</a
+    >
+    <a routerLink="/courses" class="btn-secondary">← Quay lại danh sách</a>
   </div>
 </div>

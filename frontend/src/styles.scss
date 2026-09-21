@@ -312,3 +312,11 @@ select {
 .btn-icon-danger:hover {
   background: var(--color-danger-bg);
 }
+.success-message {
+  background: #e1f3ea;
+  color: #1f7a4d;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: var(--space-3);
+}

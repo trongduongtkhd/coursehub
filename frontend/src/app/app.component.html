@@ -1,1 +1,24 @@
+<nav class="navbar">
+  <a routerLink="/courses" class="navbar__brand">CourseHub</a>
+
+  <div
+    class="navbar__links"
+    *ngIf="currentUser$ | async as user; else guestLinks"
+  >
+    <a routerLink="/courses">Khóa học</a>
+    <a routerLink="/my-courses">Khóa học của tôi</a>
+    <span class="navbar__user">{{ user.fullName }}</span>
+    <button type="button" class="btn-secondary" (click)="logout()">
+      Đăng xuất
+    </button>
+  </div>
+
+  <ng-template #guestLinks>
+    <div class="navbar__links">
+      <a routerLink="/auth/login">Đăng nhập</a>
+      <a routerLink="/auth/register" class="btn-primary">Đăng ký</a>
+    </div>
+  </ng-template>
+</nav>
+
 <router-outlet></router-outlet>
