@@ -70,22 +70,22 @@ public class EnrollmentService : IEnrollmentService
         };
     }
 
-    public async Task<List<EnrollmentDto>> GetMyEnrollmentsAsync(int userId)
-    {
-        return await _context.Enrollments
-            .Where(e => e.UserId == userId)
-            .Include(e => e.Course)
-            .ThenInclude(c => c.Instructor)
-            .OrderByDescending(e => e.EnrolledAt)
-            .Select(e => new EnrollmentDto
-            {
-                Id = e.Id,
-                CourseId = e.CourseId,
-                CourseTitle = e.Course.Title,
-                CourseThumbnailUrl = e.Course.ThumbnailUrl,
-                InstructorName = e.Course.Instructor.FullName,
-                EnrolledAt = e.EnrolledAt
-            })
-            .ToListAsync();
-    }
+public async Task<List<EnrollmentDto>> GetMyEnrollmentsAsync(int userId)
+{
+    return await _context.Enrollments
+        .Where(e => e.UserId == userId)
+        .Select(e => new EnrollmentDto
+        {
+            Id = e.Id,
+            CourseId = e.CourseId,
+            CourseTitle = e.Course.Title,
+            CourseThumbnailUrl = e.Course.ThumbnailUrl,
+            InstructorName = e.Course.Instructor.FullName,
+            EnrolledAt = e.EnrolledAt,
+            TotalLessons = e.Course.Lessons.Count(),
+            CompletedLessons = e.Course.Lessons.Count(l => l.Progresses.Any(p => p.UserId == userId && p.IsCompleted))
+        })
+        .OrderByDescending(e => e.EnrolledAt)
+        .ToListAsync();
+}
 }

@@ -4,7 +4,7 @@ using CourseHub.Application.Exceptions;
 using CourseHub.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using CourseHub.Application.DTOs.Enrollments;
 namespace CourseHub.API.Controllers;
 
 [ApiController]
@@ -12,10 +12,11 @@ namespace CourseHub.API.Controllers;
 public class CoursesController : ControllerBase
 {
     private readonly ICourseService _courseService;
-
-    public CoursesController(ICourseService courseService)
+private readonly IProgressService _progressService;
+    public CoursesController(ICourseService courseService, IProgressService progressService)
     {
         _courseService = courseService;
+        _progressService = progressService;
     }
 
     [HttpGet]
@@ -80,6 +81,17 @@ public class CoursesController : ControllerBase
             return StatusCode(403, new { message = ex.Message });
         }
     }
+
+    [Authorize]
+[HttpGet("{id}/my-progress")]
+public async Task<ActionResult<List<LessonProgressDto>>> GetMyProgress(int id)
+{
+    try
+    {
+        return Ok(await _progressService.GetCourseProgressAsync(id, GetCurrentUserId()));
+    }
+    catch (ForbiddenException ex) { return StatusCode(403, new { message = ex.Message }); }
+}
 
     private int GetCurrentUserId()
         => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);

@@ -11,10 +11,12 @@ namespace CourseHub.API.Controllers;
 public class LessonsController : ControllerBase
 {
     private readonly ILessonService _lessonService;
+    private readonly IProgressService _progressService;
 
-    public LessonsController(ILessonService lessonService)
+    public LessonsController(ILessonService lessonService, IProgressService progressService)
     {
         _lessonService = lessonService;
+        _progressService = progressService;
     }
 
     [HttpGet("api/courses/{courseId}/lessons")]
@@ -59,6 +61,27 @@ public class LessonsController : ControllerBase
         catch (NotFoundException ex) { return NotFound(new { message = ex.Message }); }
         catch (ForbiddenException ex) { return StatusCode(403, new { message = ex.Message }); }
     }
+
+    [Authorize]
+[HttpPost("api/lessons/{id}/complete")]
+public async Task<IActionResult> MarkComplete(int id)
+{
+    try
+    {
+        await _progressService.MarkCompleteAsync(id, GetCurrentUserId());
+        return NoContent();
+    }
+    catch (NotFoundException ex) { return NotFound(new { message = ex.Message }); }
+    catch (ForbiddenException ex) { return StatusCode(403, new { message = ex.Message }); }
+}
+
+[Authorize]
+[HttpDelete("api/lessons/{id}/complete")]
+public async Task<IActionResult> UnmarkComplete(int id)
+{
+    await _progressService.UnmarkCompleteAsync(id, GetCurrentUserId());
+    return NoContent();
+}
 
     private int GetCurrentUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
     private string GetCurrentUserRole() => User.FindFirstValue(ClaimTypes.Role)!;
