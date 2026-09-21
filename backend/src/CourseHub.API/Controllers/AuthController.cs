@@ -2,7 +2,7 @@ using CourseHub.Application.DTOs.Auth;
 using CourseHub.Application.Exceptions;
 using CourseHub.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.AspNetCore.Authorization;
 namespace CourseHub.API.Controllers;
 
 [ApiController]
@@ -29,4 +29,26 @@ public class AuthController : ControllerBase
             return Conflict(new { message = ex.Message });
         }
     }
+
+    [HttpPost("login")]
+public async Task<ActionResult<AuthResponse>> Login(LoginRequest request)
+{
+    try
+    {
+        var result = await _authService.LoginAsync(request);
+        return Ok(result);
+    }
+    catch (UnauthorizedException ex)
+    {
+        return Unauthorized(new { message = ex.Message });
+    }
+}
+
+[Authorize]
+[HttpGet("me")]
+public ActionResult Me()
+{
+    var claims = User.Claims.Select(c => new { c.Type, c.Value });
+    return Ok(claims);
+}
 }

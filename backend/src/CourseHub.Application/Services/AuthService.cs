@@ -12,11 +12,13 @@ public class AuthService : IAuthService
 {
     private readonly IAppDbContext _context;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly ITokenService _tokenService;
 
-    public AuthService(IAppDbContext context, IPasswordHasher passwordHasher)
+    public AuthService(IAppDbContext context, IPasswordHasher passwordHasher,ITokenService tokenService)
     {
         _context = context;
         _passwordHasher = passwordHasher;
+          _tokenService = tokenService;
     }
 
     public async Task<UserDto> RegisterAsync(RegisterRequest request)
@@ -46,4 +48,32 @@ public class AuthService : IAuthService
             Role = user.Role.ToString()
         };
     }
+
+    public async Task<AuthResponse> LoginAsync(LoginRequest request)
+{
+    var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+
+    if (user == null || !_passwordHasher.Verify(request.Password, user.PasswordHash))
+    {
+        throw new UnauthorizedException("Email hoặc mật khẩu không đúng.");
+    }
+
+    var accessToken = _tokenService.GenerateAccessToken(user);
+    var refreshTokenValue = _tokenService.GenerateRefreshToken();
+
+    _context.RefreshTokens.Add(new RefreshToken
+    {
+        Token = refreshTokenValue,
+        UserId = user.Id,
+        ExpiresAt = _tokenService.GetRefreshTokenExpiry()
+    });
+    await _context.SaveChangesAsync();
+
+    return new AuthResponse
+    {
+        AccessToken = accessToken,
+        RefreshToken = refreshTokenValue,
+        User = new UserDto { Id = user.Id, FullName = user.FullName, Email = user.Email, Role = user.Role.ToString() }
+    };
+}
 }
