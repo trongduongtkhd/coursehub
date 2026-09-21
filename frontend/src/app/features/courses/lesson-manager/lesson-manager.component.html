@@ -1,0 +1,57 @@
+<div class="lesson-manager">
+  <p *ngIf="loading">Đang tải danh sách bài học...</p>
+
+  <div *ngIf="!loading">
+    <div class="lesson-item" *ngFor="let lesson of lessons">
+      <span class="lesson-item__order">{{ lesson.orderIndex }}.</span>
+      <span class="lesson-item__title">{{ lesson.title }}</span>
+      <button
+        type="button"
+        class="btn-icon-danger"
+        (click)="onDeleteLesson(lesson)"
+      >
+        Xóa
+      </button>
+    </div>
+    <p *ngIf="lessons.length === 0" class="empty-state">Chưa có bài học nào.</p>
+  </div>
+
+  <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+
+  <button
+    type="button"
+    class="btn-secondary"
+    *ngIf="!showAddForm"
+    (click)="showAddForm = true"
+  >
+    + Thêm bài học
+  </button>
+
+  <form
+    *ngIf="showAddForm"
+    [formGroup]="addForm"
+    (ngSubmit)="onAddLesson()"
+    class="lesson-add-form"
+  >
+    <div class="form-field">
+      <label>Tiêu đề bài học</label>
+      <input
+        type="text"
+        formControlName="title"
+        placeholder="VD: Bài 1 - Giới thiệu"
+      />
+    </div>
+    <div class="form-field">
+      <label>Nội dung</label>
+      <textarea formControlName="content" rows="4"></textarea>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn-primary" [disabled]="addForm.invalid">
+        Lưu bài học
+      </button>
+      <button type="button" class="btn-secondary" (click)="showAddForm = false">
+        Hủy
+      </button>
+    </div>
+  </form>
+</div>

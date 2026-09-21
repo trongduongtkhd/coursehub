@@ -2,7 +2,28 @@
   <div class="card form-card">
     <h2>{{ isEditMode ? "Sửa khóa học" : "Tạo khóa học mới" }}</h2>
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="tabs" *ngIf="isEditMode">
+      <button
+        type="button"
+        [class.active]="activeTab === 'info'"
+        (click)="activeTab = 'info'"
+      >
+        Thông tin
+      </button>
+      <button
+        type="button"
+        [class.active]="activeTab === 'lessons'"
+        (click)="activeTab = 'lessons'"
+      >
+        Bài học
+      </button>
+    </div>
+
+    <form
+      *ngIf="activeTab === 'info'"
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+    >
       <div class="form-field">
         <label>Tiêu đề</label>
         <input
@@ -27,9 +48,7 @@
           <option value="Archived">Archived</option>
         </select>
       </div>
-
       <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
-
       <div class="form-actions">
         <button type="submit" class="btn-primary" [disabled]="form.invalid">
           {{ isEditMode ? "Lưu thay đổi" : "Tạo khóa học" }}
@@ -37,5 +56,10 @@
         <a routerLink="/courses" class="btn-secondary">Hủy</a>
       </div>
     </form>
+
+    <app-lesson-manager
+      *ngIf="isEditMode && activeTab === 'lessons'"
+      [courseId]="courseId!"
+    ></app-lesson-manager>
   </div>
 </div>

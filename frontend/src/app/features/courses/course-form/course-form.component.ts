@@ -13,7 +13,7 @@ export class CourseFormComponent implements OnInit {
   isEditMode = false;
   courseId: number | null = null;
   errorMessage = '';
-
+  activeTab: 'info' | 'lessons' = 'info';
   constructor(
     private fb: FormBuilder,
     private courseService: CourseService,
