@@ -1,0 +1,41 @@
+<div class="page-container">
+  <div class="card form-card">
+    <h2>{{ isEditMode ? "Sửa khóa học" : "Tạo khóa học mới" }}</h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <label>Tiêu đề</label>
+        <input
+          type="text"
+          formControlName="title"
+          placeholder="VD: Nhập môn Angular"
+        />
+      </div>
+      <div class="form-field">
+        <label>Mô tả</label>
+        <textarea
+          formControlName="description"
+          rows="5"
+          placeholder="Mô tả ngắn về khóa học..."
+        ></textarea>
+      </div>
+      <div class="form-field" *ngIf="isEditMode">
+        <label>Trạng thái</label>
+        <select formControlName="status">
+          <option value="Draft">Draft</option>
+          <option value="Published">Published</option>
+          <option value="Archived">Archived</option>
+        </select>
+      </div>
+
+      <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="form.invalid">
+          {{ isEditMode ? "Lưu thay đổi" : "Tạo khóa học" }}
+        </button>
+        <a routerLink="/courses" class="btn-secondary">Hủy</a>
+      </div>
+    </form>
+  </div>
+</div>

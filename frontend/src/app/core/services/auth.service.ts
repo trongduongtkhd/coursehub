@@ -53,4 +53,8 @@ export class AuthService {
   getRole(): string | null {
     return this.tokenStorage.getUser()?.role ?? null;
   }
+
+  getCurrentUser(): User | null {
+    return this.tokenStorage.getUser();
+  }
 }

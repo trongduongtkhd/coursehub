@@ -1,24 +1,37 @@
-<div class="auth-form">
-  <h2>Đăng nhập</h2>
+<div class="auth-page">
+  <div class="auth-card">
+    <h2>Đăng nhập</h2>
+    <p class="subtitle">Chào mừng quay lại CourseHub</p>
 
-  <p *ngIf="loggedInUser">
-    Xin chào, {{ loggedInUser }}! Đăng nhập thành công.
-  </p>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <label>Email</label>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="ban@email.com"
+        />
+      </div>
+      <div class="form-field">
+        <label>Mật khẩu</label>
+        <input
+          type="password"
+          formControlName="password"
+          placeholder="••••••••"
+        />
+      </div>
+      <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="form.invalid || loading"
+      >
+        {{ loading ? "Đang đăng nhập..." : "Đăng nhập" }}
+      </button>
+    </form>
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!loggedInUser">
-    <div>
-      <label>Email</label>
-      <input type="email" formControlName="email" />
-    </div>
-    <div>
-      <label>Mật khẩu</label>
-      <input type="password" formControlName="password" />
-    </div>
-    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
-    <button type="submit" [disabled]="form.invalid || loading">
-      Đăng nhập
-    </button>
-  </form>
-
-  <a routerLink="/auth/register">Chưa có tài khoản? Đăng ký</a>
+    <a class="switch-link" routerLink="/auth/register"
+      >Chưa có tài khoản? <strong>Đăng ký ngay</strong></a
+    >
+  </div>
 </div>
