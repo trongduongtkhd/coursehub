@@ -13,10 +13,12 @@
   </div>
 
   <div class="course-grid" *ngIf="!loading && courses.length > 0">
-    <div class="card course-card" *ngFor="let course of courses">
-      <h3>
-        <a [routerLink]="['/courses', course.id]">{{ course.title }}</a>
-      </h3>
+    <a
+      class="card course-card"
+      *ngFor="let course of courses"
+      [routerLink]="['/courses', course.id]"
+    >
+      <h3>{{ course.title }}</h3>
       <p class="description">{{ course.description }}</p>
       <div class="meta">
         <span>{{ course.instructorName }}</span>
@@ -26,6 +28,6 @@
           >{{ course.status }}</span
         >
       </div>
-    </div>
+    </a>
   </div>
 </div>
