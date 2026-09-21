@@ -1,20 +1,45 @@
-<div class="auth-form">
-  <h2>Đăng ký</h2>
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div>
-      <label>Họ tên</label>
-      <input type="text" formControlName="fullName" />
-    </div>
-    <div>
-      <label>Email</label>
-      <input type="email" formControlName="email" />
-    </div>
-    <div>
-      <label>Mật khẩu</label>
-      <input type="password" formControlName="password" />
-    </div>
-    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
-    <button type="submit" [disabled]="form.invalid || loading">Đăng ký</button>
-  </form>
-  <a routerLink="/auth/login">Đã có tài khoản? Đăng nhập</a>
+<div class="auth-page">
+  <div class="auth-card">
+    <h2>Đăng ký</h2>
+    <p class="subtitle">Tạo tài khoản học viên mới</p>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <label>Họ tên</label>
+        <input
+          type="text"
+          formControlName="fullName"
+          placeholder="Nguyễn Văn A"
+        />
+      </div>
+      <div class="form-field">
+        <label>Email</label>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="ban@email.com"
+        />
+      </div>
+      <div class="form-field">
+        <label>Mật khẩu</label>
+        <input
+          type="password"
+          formControlName="password"
+          placeholder="Tối thiểu 6 ký tự"
+        />
+      </div>
+      <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="form.invalid || loading"
+      >
+        {{ loading ? "Đang đăng ký..." : "Đăng ký" }}
+      </button>
+    </form>
+
+    <a class="switch-link" routerLink="/auth/login"
+      >Đã có tài khoản? <strong>Đăng nhập</strong></a
+    >
+  </div>
 </div>

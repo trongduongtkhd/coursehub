@@ -1,0 +1,13 @@
+.form-card {
+  max-width: 560px;
+  margin: 0 auto;
+}
+.form-card textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+.form-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}

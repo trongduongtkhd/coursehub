@@ -1,1 +1,300 @@
-/* You can add global styles to this file, and also import other style files */
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --color-primary: #0f5c5c;
+  --color-primary-dark: #0b4747;
+  --color-primary-light: #e6f0ef;
+  --color-accent: #e8a33d;
+  --color-accent-dark: #c98826;
+  --color-bg: #f7f5f0;
+  --color-surface: #ffffff;
+  --color-border: #e0ddd5;
+  --color-text: #1f2937;
+  --color-text-muted: #6b7280;
+  --color-danger: #c0392b;
+  --color-danger-bg: #fbeae8;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.1);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-8: 48px;
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--space-2);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: 14px;
+}
+
+/* ---------- Nút bấm dùng chung ---------- */
+.btn-primary,
+.btn-secondary {
+  display: inline-block;
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid transparent;
+  text-align: center;
+  transition:
+    background 0.15s ease,
+    transform 0.05s ease,
+    border-color 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-accent-dark);
+  text-decoration: none;
+}
+.btn-primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn-primary:disabled {
+  background: #d8d4c8;
+  color: #9c978a;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+.btn-secondary:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  text-decoration: none;
+}
+
+/* ---------- Form dùng chung ---------- */
+.form-field {
+  margin-bottom: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.form-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+.form-field input,
+.form-field textarea,
+.form-field select {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.error-message {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: var(--space-3);
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: var(--space-8) 0;
+}
+
+/* ---------- Auth (Login/Register) ---------- */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+}
+.auth-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-8) var(--space-6);
+  width: 100%;
+  max-width: 400px;
+}
+.auth-card h2 {
+  font-size: 22px;
+}
+.auth-card .subtitle {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  margin-bottom: var(--space-5);
+}
+.auth-card form button {
+  width: 100%;
+  padding: 12px;
+  margin-top: var(--space-2);
+}
+.auth-card .switch-link {
+  display: block;
+  text-align: center;
+  margin-top: var(--space-5);
+  font-size: 13px;
+}
+
+/* ---------- Layout trang chung ---------- */
+.page-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5);
+}
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------- Course list ---------- */
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+.course-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.course-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.course-card h3 {
+  font-size: 16px;
+  margin: 0;
+}
+.course-card h3 a {
+  color: var(--color-text);
+}
+.course-card .description {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.course-card .meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: auto;
+}
+
+/* ---------- Badge trạng thái ---------- */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.badge-draft {
+  background: #eeeae0;
+  color: #8a8371;
+}
+.badge-published {
+  background: #e1f3ea;
+  color: #1f7a4d;
+}
+.badge-archived {
+  background: #f3e1e1;
+  color: #a13333;
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding: var(--space-4) var(--space-3);
+  }
+  .auth-card {
+    padding: var(--space-6) var(--space-4);
+  }
+}
