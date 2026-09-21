@@ -1,0 +1,44 @@
+<div class="lesson-player">
+  <p *ngIf="loading">Đang tải...</p>
+  <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+
+  <div *ngIf="!loading && lessons.length > 0" class="lesson-player__layout">
+    <aside class="lesson-player__sidebar">
+      <div class="lesson-player__progress">
+        <div class="progress-bar">
+          <div
+            class="progress-bar__fill"
+            [style.width.%]="progressPercent"
+          ></div>
+        </div>
+        <span
+          >{{ completedCount }}/{{ lessons.length }} bài —
+          {{ progressPercent }}%</span
+        >
+      </div>
+
+      <div
+        class="lesson-nav-item"
+        *ngFor="let lesson of lessons"
+        [class.active]="selectedLesson === lesson"
+        (click)="selectLesson(lesson)"
+      >
+        <input
+          type="checkbox"
+          [checked]="lesson.isCompleted"
+          (click)="toggleComplete(lesson, $event)"
+        />
+        <span>{{ lesson.orderIndex }}. {{ lesson.title }}</span>
+      </div>
+    </aside>
+
+    <main class="lesson-player__content" *ngIf="selectedLesson">
+      <h2>{{ selectedLesson.title }}</h2>
+      <p>{{ selectedLesson.content }}</p>
+    </main>
+  </div>
+
+  <div *ngIf="!loading && lessons.length === 0" class="empty-state">
+    Khóa học này chưa có bài học nào.
+  </div>
+</div>

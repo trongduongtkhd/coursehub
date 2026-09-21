@@ -13,12 +13,19 @@
     <a
       class="card course-card"
       *ngFor="let e of enrollments"
-      [routerLink]="['/courses', e.courseId]"
+      [routerLink]="['/my-courses', e.courseId]"
     >
       <h3>{{ e.courseTitle }}</h3>
       <p class="description">Giảng viên: {{ e.instructorName }}</p>
+      <div class="progress-bar">
+        <div
+          class="progress-bar__fill"
+          [style.width.%]="e.progressPercent"
+        ></div>
+      </div>
       <div class="meta">
-        <span>Đăng ký lúc: {{ e.enrolledAt | date: "dd/MM/yyyy" }}</span>
+        <span>{{ e.completedLessons }}/{{ e.totalLessons }} bài học</span>
+        <span>{{ e.progressPercent }}%</span>
       </div>
     </a>
   </div>
