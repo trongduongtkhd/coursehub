@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import {
   Course,
   CreateCourseRequest,
+  ThumbnailUploadResponse,
   UpdateCourseRequest,
 } from 'src/app/core/models/course.model';
 
@@ -32,5 +33,17 @@ export class CourseService {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  uploadThumbnail(
+    courseId: number,
+    file: File,
+  ): Observable<ThumbnailUploadResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<ThumbnailUploadResponse>(
+      `${this.baseUrl}/${courseId}/thumbnail`,
+      formData,
+    );
   }
 }

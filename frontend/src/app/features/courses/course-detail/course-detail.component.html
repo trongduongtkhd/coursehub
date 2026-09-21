@@ -2,6 +2,12 @@
 <div *ngIf="notFound" class="empty-state">Không tìm thấy khóa học.</div>
 
 <div *ngIf="course" class="card course-detail">
+  <img
+    *ngIf="course.thumbnailUrl"
+    [src]="course.thumbnailUrl | apiImage"
+    class="course-detail__thumbnail"
+    alt=""
+  />
   <div class="course-detail__header">
     <h2>{{ course.title }}</h2>
     <span class="badge" [ngClass]="'badge-' + course.status.toLowerCase()">{{

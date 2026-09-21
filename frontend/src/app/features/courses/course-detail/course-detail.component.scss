@@ -79,3 +79,10 @@
 .review-item small {
   color: var(--color-text-muted);
 }
+.course-detail__thumbnail {
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-4);
+}
