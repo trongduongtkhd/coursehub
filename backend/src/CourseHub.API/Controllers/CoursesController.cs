@@ -93,6 +93,30 @@ public async Task<ActionResult<List<LessonProgressDto>>> GetMyProgress(int id)
     catch (ForbiddenException ex) { return StatusCode(403, new { message = ex.Message }); }
 }
 
+
+[Authorize(Roles = "Admin,Instructor")]
+[HttpPost("{id}/thumbnail")]
+[RequestSizeLimit(2 * 1024 * 1024)]
+public async Task<IActionResult> UploadThumbnail(int id, IFormFile file)
+{
+    if (file == null || file.Length == 0)
+    {
+        return BadRequest(new { message = "Vui lòng chọn một file ảnh." });
+    }
+
+    var extension = Path.GetExtension(file.FileName);
+
+    try
+    {
+        using var stream = file.OpenReadStream();
+        var url = await _courseService.UpdateThumbnailAsync(id, stream, extension, GetCurrentUserId(), GetCurrentUserRole());
+        return Ok(new { thumbnailUrl = url });
+    }
+    catch (NotFoundException ex) { return NotFound(new { message = ex.Message }); }
+    catch (ForbiddenException ex) { return StatusCode(403, new { message = ex.Message }); }
+    catch (BadRequestException ex) { return BadRequest(new { message = ex.Message }); }
+}
+
     private int GetCurrentUserId()
         => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
