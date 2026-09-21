@@ -19,3 +19,6 @@ export interface UpdateCourseRequest {
   description: string;
   status: string;
 }
+export interface ThumbnailUploadResponse {
+  thumbnailUrl: string;
+}

@@ -30,3 +30,13 @@
   color: var(--color-primary);
   border-bottom-color: var(--color-primary);
 }
+.thumbnail-preview {
+  margin-bottom: var(--space-3);
+}
+.thumbnail-preview img {
+  max-width: 240px;
+  max-height: 160px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  object-fit: cover;
+}

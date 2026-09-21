@@ -32,6 +32,7 @@
           placeholder="VD: Nhập môn Angular"
         />
       </div>
+
       <div class="form-field">
         <label>Mô tả</label>
         <textarea
@@ -39,6 +40,38 @@
           rows="5"
           placeholder="Mô tả ngắn về khóa học..."
         ></textarea>
+      </div>
+
+      <div class="form-field" *ngIf="isEditMode">
+        <label>Ảnh đại diện</label>
+
+        <div
+          class="thumbnail-preview"
+          *ngIf="previewUrl || currentThumbnailUrl"
+        >
+          <img
+            [src]="previewUrl || (currentThumbnailUrl | apiImage)"
+            alt="Ảnh đại diện khóa học"
+          />
+        </div>
+
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          (change)="onFileSelected($event)"
+        />
+
+        <p *ngIf="thumbnailError" class="error-message">{{ thumbnailError }}</p>
+
+        <button
+          type="button"
+          class="btn-secondary"
+          *ngIf="selectedFile"
+          [disabled]="uploadingThumbnail"
+          (click)="onUploadThumbnail()"
+        >
+          {{ uploadingThumbnail ? "Đang tải lên..." : "Tải ảnh lên" }}
+        </button>
       </div>
       <div class="form-field" *ngIf="isEditMode">
         <label>Trạng thái</label>

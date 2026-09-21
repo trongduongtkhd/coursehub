@@ -18,6 +18,12 @@
       *ngFor="let course of courses"
       [routerLink]="['/courses', course.id]"
     >
+      <img
+        *ngIf="course.thumbnailUrl"
+        [src]="course.thumbnailUrl | apiImage"
+        class="course-card__thumbnail"
+        alt=""
+      />
       <h3>{{ course.title }}</h3>
       <p class="description">{{ course.description }}</p>
       <div class="meta">

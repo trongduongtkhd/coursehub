@@ -11,10 +11,12 @@ namespace CourseHub.Application.Services;
 public class CourseService : ICourseService
 {
     private readonly IAppDbContext _context;
+private readonly IFileStorageService _fileStorageService;
 
-    public CourseService(IAppDbContext context)
+    public CourseService(IAppDbContext context, IFileStorageService fileStorageService)
     {
         _context = context;
+        _fileStorageService = fileStorageService;
     }
 
     public async Task<List<CourseDto>> GetAllAsync()
@@ -109,4 +111,23 @@ public class CourseService : ICourseService
         InstructorName = c.Instructor.FullName,
         CreatedAt = c.CreatedAt
     };
+
+    public async Task<string> UpdateThumbnailAsync(int courseId, Stream fileStream, string fileExtension, int currentUserId, string currentUserRole)
+{
+    var course = await _context.Courses.FirstOrDefaultAsync(c => c.Id == courseId);
+    if (course == null)
+    {
+        throw new NotFoundException("Không tìm thấy khóa học.");
+    }
+
+    EnsureCanModify(course, currentUserId, currentUserRole);
+
+    var url = await _fileStorageService.SaveCourseThumbnailAsync(fileStream, fileExtension);
+
+    course.ThumbnailUrl = url;
+    course.UpdatedAt = DateTime.UtcNow;
+    await _context.SaveChangesAsync();
+
+    return url;
+}
 }

@@ -14,6 +14,11 @@ export class CourseFormComponent implements OnInit {
   courseId: number | null = null;
   errorMessage = '';
   activeTab: 'info' | 'lessons' = 'info';
+  selectedFile: File | null = null;
+  previewUrl: string | null = null;
+  uploadingThumbnail = false;
+  thumbnailError = '';
+  currentThumbnailUrl: string | null = null;
   constructor(
     private fb: FormBuilder,
     private courseService: CourseService,
@@ -32,9 +37,10 @@ export class CourseFormComponent implements OnInit {
     if (idParam) {
       this.isEditMode = true;
       this.courseId = Number(idParam);
-      this.courseService
-        .getById(this.courseId)
-        .subscribe((course) => this.form.patchValue(course));
+      this.courseService.getById(this.courseId).subscribe((course) => {
+        this.form.patchValue(course);
+        this.currentThumbnailUrl = course.thumbnailUrl;
+      });
     }
   }
 
@@ -56,5 +62,51 @@ export class CourseFormComponent implements OnInit {
           (this.errorMessage = err.error?.message ?? 'Tạo khóa học thất bại.'),
       });
     }
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.thumbnailError = 'Chỉ chấp nhận file JPG, PNG hoặc WEBP.';
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      this.thumbnailError = 'Kích thước file tối đa 2MB.';
+      return;
+    }
+
+    this.thumbnailError = '';
+    this.selectedFile = file;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.previewUrl = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  onUploadThumbnail(): void {
+    if (!this.selectedFile || !this.courseId) return;
+
+    this.uploadingThumbnail = true;
+    this.thumbnailError = '';
+
+    this.courseService
+      .uploadThumbnail(this.courseId, this.selectedFile)
+      .subscribe({
+        next: (res) => {
+          this.currentThumbnailUrl = res.thumbnailUrl;
+          this.selectedFile = null;
+          this.uploadingThumbnail = false;
+        },
+        error: (err) => {
+          this.thumbnailError = err.error?.message ?? 'Upload thất bại.';
+          this.uploadingThumbnail = false;
+        },
+      });
   }
 }
