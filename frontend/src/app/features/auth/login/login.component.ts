@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/core/services/auth.service';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -16,6 +16,7 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+    private router: Router,
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -31,10 +32,7 @@ export class LoginComponent {
     this.errorMessage = '';
 
     this.authService.login(this.form.value).subscribe({
-      next: (response) => {
-        this.loggedInUser = response.user.fullName;
-        this.loading = false;
-      },
+      next: () => this.router.navigate(['/courses']),
       error: (err) => {
         this.errorMessage = err.error?.message ?? 'Đăng nhập thất bại.';
         this.loading = false;

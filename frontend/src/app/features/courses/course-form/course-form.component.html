@@ -1,0 +1,24 @@
+<h2>{{ isEditMode ? "Sửa khóa học" : "Tạo khóa học mới" }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div>
+    <label>Tiêu đề</label>
+    <input type="text" formControlName="title" />
+  </div>
+  <div>
+    <label>Mô tả</label>
+    <textarea formControlName="description"></textarea>
+  </div>
+  <div *ngIf="isEditMode">
+    <label>Trạng thái</label>
+    <select formControlName="status">
+      <option value="Draft">Draft</option>
+      <option value="Published">Published</option>
+      <option value="Archived">Archived</option>
+    </select>
+  </div>
+  <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+  <button type="submit" [disabled]="form.invalid">
+    {{ isEditMode ? "Lưu" : "Tạo" }}
+  </button>
+</form>

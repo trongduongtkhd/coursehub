@@ -1,0 +1,17 @@
+<p *ngIf="loading">Đang tải...</p>
+<p *ngIf="notFound">Không tìm thấy khóa học.</p>
+
+<div *ngIf="course">
+  <h2>{{ course.title }}</h2>
+  <p>{{ course.description }}</p>
+  <small
+    >Giảng viên: {{ course.instructorName }} · Trạng thái:
+    {{ course.status }}</small
+  >
+  <br />
+  <a *ngIf="canEdit" [routerLink]="['/courses', course.id, 'edit']"
+    >Sửa khóa học</a
+  >
+  <br />
+  <a routerLink="/courses">← Quay lại danh sách</a>
+</div>

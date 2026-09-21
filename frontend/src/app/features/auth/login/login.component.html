@@ -1,10 +1,6 @@
 <div class="auth-form">
   <h2>Đăng nhập</h2>
 
-  <p *ngIf="loggedInUser">
-    Xin chào, {{ loggedInUser }}! Đăng nhập thành công.
-  </p>
-
   <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!loggedInUser">
     <div>
       <label>Email</label>
