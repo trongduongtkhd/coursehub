@@ -1,0 +1,25 @@
+<div class="page-container">
+  <div class="page-header">
+    <h2>Khóa học của tôi</h2>
+  </div>
+
+  <p *ngIf="loading">Đang tải...</p>
+  <div *ngIf="!loading && enrollments.length === 0" class="empty-state">
+    Bạn chưa đăng ký khóa học nào.
+    <a routerLink="/courses">Khám phá khóa học</a>
+  </div>
+
+  <div class="course-grid" *ngIf="!loading && enrollments.length > 0">
+    <a
+      class="card course-card"
+      *ngFor="let e of enrollments"
+      [routerLink]="['/courses', e.courseId]"
+    >
+      <h3>{{ e.courseTitle }}</h3>
+      <p class="description">Giảng viên: {{ e.instructorName }}</p>
+      <div class="meta">
+        <span>Đăng ký lúc: {{ e.enrolledAt | date: "dd/MM/yyyy" }}</span>
+      </div>
+    </a>
+  </div>
+</div>
