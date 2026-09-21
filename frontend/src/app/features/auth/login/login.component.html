@@ -1,0 +1,24 @@
+<div class="auth-form">
+  <h2>Đăng nhập</h2>
+
+  <p *ngIf="loggedInUser">
+    Xin chào, {{ loggedInUser }}! Đăng nhập thành công.
+  </p>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!loggedInUser">
+    <div>
+      <label>Email</label>
+      <input type="email" formControlName="email" />
+    </div>
+    <div>
+      <label>Mật khẩu</label>
+      <input type="password" formControlName="password" />
+    </div>
+    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+    <button type="submit" [disabled]="form.invalid || loading">
+      Đăng nhập
+    </button>
+  </form>
+
+  <a routerLink="/auth/register">Chưa có tài khoản? Đăng ký</a>
+</div>
