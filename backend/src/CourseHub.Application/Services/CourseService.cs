@@ -5,7 +5,7 @@ using CourseHub.Application.Interfaces.Services;
 using CourseHub.Domain.Entities;
 using CourseHub.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-
+using CourseHub.Application.DTOs.Common;
 namespace CourseHub.Application.Services;
 
 public class CourseService : ICourseService
@@ -19,13 +19,50 @@ private readonly IFileStorageService _fileStorageService;
         _fileStorageService = fileStorageService;
     }
 
-    public async Task<List<CourseDto>> GetAllAsync()
+   public async Task<PagedResult<CourseDto>> GetAllAsync(CourseQueryParameters query)
+{
+    var pageSize = Math.Clamp(query.PageSize, 1, 100);
+    var page = Math.Max(query.Page, 1);
+
+    var courses = _context.Courses.Include(c => c.Instructor).Include(c => c.Reviews).AsQueryable();
+
+    if (!string.IsNullOrWhiteSpace(query.Search))
     {
-        return await _context.Courses
-            .Include(c => c.Instructor)
-            .Select(c => ToDto(c))
-            .ToListAsync();
+        courses = courses.Where(c => c.Title.Contains(query.Search) || c.Description.Contains(query.Search));
     }
+
+    if (!string.IsNullOrWhiteSpace(query.Status) && Enum.TryParse<CourseStatus>(query.Status, true, out var statusEnum))
+    {
+        courses = courses.Where(c => c.Status == statusEnum);
+    }
+
+    if (query.InstructorId.HasValue)
+    {
+        courses = courses.Where(c => c.InstructorId == query.InstructorId.Value);
+    }
+
+    courses = query.SortBy?.ToLower() switch
+    {
+        "title" => query.SortDir == "asc" ? courses.OrderBy(c => c.Title) : courses.OrderByDescending(c => c.Title),
+        _ => query.SortDir == "asc" ? courses.OrderBy(c => c.CreatedAt) : courses.OrderByDescending(c => c.CreatedAt)
+    };
+
+    var totalCount = await courses.CountAsync();
+
+    var items = await courses
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .Select(c => ToDto(c))
+        .ToListAsync();
+
+    return new PagedResult<CourseDto>
+    {
+        Items = items,
+        Page = page,
+        PageSize = pageSize,
+        TotalCount = totalCount
+    };
+}
 
     public async Task<CourseDto> GetByIdAsync(int id)
     {

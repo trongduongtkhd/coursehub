@@ -5,6 +5,8 @@ using CourseHub.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CourseHub.Application.DTOs.Enrollments;
+using System.Xml.Serialization;
+using CourseHub.Application.DTOs.Common;
 namespace CourseHub.API.Controllers;
 
 [ApiController]
@@ -19,9 +21,9 @@ private readonly IProgressService _progressService;
         _progressService = progressService;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<CourseDto>>> GetAll()
-        => Ok(await _courseService.GetAllAsync());
+   [HttpGet]
+public async Task<ActionResult<PagedResult<CourseDto>>> GetAll([FromQuery] CourseQueryParameters query)
+    => Ok(await _courseService.GetAllAsync(query));
 
     [HttpGet("{id}")]
     public async Task<ActionResult<CourseDto>> GetById(int id)
