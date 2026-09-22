@@ -1,0 +1,64 @@
+<div class="page-container">
+  <div class="page-header"><h2>Dashboard thống kê</h2></div>
+
+  <p *ngIf="loading">Đang tải...</p>
+
+  <div *ngIf="!loading && stats">
+    <div class="stat-grid">
+      <div class="card stat-tile">
+        <span class="stat-tile__value">{{ stats.totalUsers }}</span>
+        <span class="stat-tile__label">Người dùng</span>
+        <span class="stat-tile__detail"
+          >{{ stats.totalStudents }} Student ·
+          {{ stats.totalInstructors }} Instructor ·
+          {{ stats.totalAdmins }} Admin</span
+        >
+      </div>
+      <div class="card stat-tile">
+        <span class="stat-tile__value">{{ stats.totalCourses }}</span>
+        <span class="stat-tile__label">Khóa học</span>
+        <span class="stat-tile__detail"
+          >{{ stats.publishedCourses }} Published ·
+          {{ stats.draftCourses }} Draft ·
+          {{ stats.archivedCourses }} Archived</span
+        >
+      </div>
+      <div class="card stat-tile">
+        <span class="stat-tile__value">{{ stats.totalEnrollments }}</span>
+        <span class="stat-tile__label">Lượt đăng ký</span>
+      </div>
+      <div class="card stat-tile">
+        <span class="stat-tile__value">{{
+          stats.averageRatingSystemWide
+        }}</span>
+        <span class="stat-tile__label">Điểm đánh giá trung bình</span>
+      </div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="card chart-card">
+        <h3>Lượt đăng ký theo tháng</h3>
+        <apx-chart
+          [series]="enrollmentChart.series!"
+          [chart]="enrollmentChart.chart!"
+          [xaxis]="enrollmentChart.xaxis!"
+          [stroke]="enrollmentChart.stroke!"
+          [dataLabels]="enrollmentChart.dataLabels!"
+          [colors]="enrollmentChart.colors!"
+        ></apx-chart>
+      </div>
+
+      <div class="card chart-card">
+        <h3>Top 5 khóa học nhiều học viên nhất</h3>
+        <apx-chart
+          [series]="topCoursesChart.series!"
+          [chart]="topCoursesChart.chart!"
+          [xaxis]="topCoursesChart.xaxis!"
+          [plotOptions]="topCoursesChart.plotOptions!"
+          [dataLabels]="topCoursesChart.dataLabels!"
+          [colors]="topCoursesChart.colors!"
+        ></apx-chart>
+      </div>
+    </div>
+  </div>
+</div>
