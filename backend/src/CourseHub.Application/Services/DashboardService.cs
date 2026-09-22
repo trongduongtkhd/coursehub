@@ -9,14 +9,23 @@ namespace CourseHub.Application.Services;
 public class DashboardService : IDashboardService
 {
     private readonly IAppDbContext _context;
-
-    public DashboardService(IAppDbContext context)
+    private readonly ICacheService _cache;
+    public DashboardService(IAppDbContext context, ICacheService cache)
     {
         _context = context;
+        _cache = cache;
     }
 
     public async Task<DashboardStatsDto> GetStatsAsync()
     {
+
+    const string cacheKey = "dashboard:stats";
+    var cached = _cache.Get<DashboardStatsDto>(cacheKey);
+    if (cached != null)
+    {
+        return cached;
+    }
+
         var usersByRole = await _context.Users
             .GroupBy(u => u.Role)
             .Select(g => new { Role = g.Key, Count = g.Count() })
@@ -56,7 +65,7 @@ public class DashboardService : IDashboardService
             .Take(5)
             .ToListAsync();
 
-        return new DashboardStatsDto
+        var result =  new DashboardStatsDto
         {
             TotalUsers = usersByRole.Sum(x => x.Count),
             TotalAdmins = usersByRole.FirstOrDefault(x => x.Role == Role.Admin)?.Count ?? 0,
@@ -74,5 +83,8 @@ public class DashboardService : IDashboardService
             EnrollmentsByMonth = enrollmentsByMonth,
             TopCourses = topCourses
         };
+          _cache.Set(cacheKey, result, TimeSpan.FromMinutes(2));
+          return result;
+        
     }
 }
