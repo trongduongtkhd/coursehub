@@ -27,52 +27,37 @@ public class LessonsController : ControllerBase
     [HttpPost("api/courses/{courseId}/lessons")]
     public async Task<ActionResult<LessonDto>> Create(int courseId, CreateLessonRequest request)
     {
-        try
-        {
+       
             var lesson = await _lessonService.CreateAsync(courseId, request, GetCurrentUserId(), GetCurrentUserRole());
             return StatusCode(201, lesson);
-        }
-        catch (NotFoundException ex) { return NotFound(new { message = ex.Message }); }
-        catch (ForbiddenException ex) { return StatusCode(403, new { message = ex.Message }); }
+       
     }
 
     [Authorize(Roles = "Admin,Instructor")]
     [HttpPut("api/lessons/{id}")]
     public async Task<IActionResult> Update(int id, UpdateLessonRequest request)
     {
-        try
-        {
+      
             await _lessonService.UpdateAsync(id, request, GetCurrentUserId(), GetCurrentUserRole());
             return NoContent();
-        }
-        catch (NotFoundException ex) { return NotFound(new { message = ex.Message }); }
-        catch (ForbiddenException ex) { return StatusCode(403, new { message = ex.Message }); }
+  
     }
 
     [Authorize(Roles = "Admin,Instructor")]
     [HttpDelete("api/lessons/{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        try
-        {
+       
             await _lessonService.DeleteAsync(id, GetCurrentUserId(), GetCurrentUserRole());
             return NoContent();
-        }
-        catch (NotFoundException ex) { return NotFound(new { message = ex.Message }); }
-        catch (ForbiddenException ex) { return StatusCode(403, new { message = ex.Message }); }
-    }
+   }
 
-    [Authorize]
+[Authorize]
 [HttpPost("api/lessons/{id}/complete")]
 public async Task<IActionResult> MarkComplete(int id)
 {
-    try
-    {
         await _progressService.MarkCompleteAsync(id, GetCurrentUserId());
         return NoContent();
-    }
-    catch (NotFoundException ex) { return NotFound(new { message = ex.Message }); }
-    catch (ForbiddenException ex) { return StatusCode(403, new { message = ex.Message }); }
 }
 
 [Authorize]

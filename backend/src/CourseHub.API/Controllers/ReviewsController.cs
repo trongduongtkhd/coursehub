@@ -29,14 +29,9 @@ public class ReviewsController : ControllerBase
     [HttpPost("api/courses/{courseId}/reviews")]
     public async Task<ActionResult<ReviewDto>> Upsert(int courseId, CreateReviewRequest request)
     {
-        try
-        {
             var review = await _reviewService.UpsertAsync(courseId, request, GetCurrentUserId());
             return Ok(review);
-        }
-        catch (NotFoundException ex) { return NotFound(new { message = ex.Message }); }
-        catch (ForbiddenException ex) { return StatusCode(403, new { message = ex.Message }); }
-        catch (BadRequestException ex) { return BadRequest(new { message = ex.Message }); }
+      
     }
 
     private int GetCurrentUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
