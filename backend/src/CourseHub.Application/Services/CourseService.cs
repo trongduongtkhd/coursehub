@@ -12,7 +12,7 @@ public class CourseService : ICourseService
 {
     private readonly IAppDbContext _context;
     private readonly ICacheService _cache;
-private readonly IFileStorageService _fileStorageService;
+    private readonly IFileStorageService _fileStorageService;
 
     public CourseService(IAppDbContext context, IFileStorageService fileStorageService,ICacheService cache)
     {
@@ -123,9 +123,7 @@ private readonly IFileStorageService _fileStorageService;
         course.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
-       _cache.Remove($"course:{id}");
-
-      
+       _cache.Remove($"course:{id}"); 
     }
 
     public async Task DeleteAsync(int id, int currentUserId, string currentUserRole)
