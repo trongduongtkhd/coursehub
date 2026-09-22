@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
-
+using CourseHub.API.Middleware;
 using CourseHub.Infrastructure.Persistence;
 using CourseHub.Infrastructure.Persistence.Seed;
 var builder = WebApplication.CreateBuilder(args);
@@ -61,8 +61,12 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
-var app = builder.Build();
 
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+var app = builder.Build();
+app.UseExceptionHandler();  
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

@@ -21,14 +21,9 @@ public class EnrollmentsController : ControllerBase
     [HttpPost("api/courses/{courseId}/enroll")]
     public async Task<ActionResult<EnrollmentDto>> Enroll(int courseId)
     {
-        try
-        {
             var enrollment = await _enrollmentService.EnrollAsync(courseId, GetCurrentUserId());
             return StatusCode(201, enrollment);
-        }
-        catch (NotFoundException ex) { return NotFound(new { message = ex.Message }); }
-        catch (BadRequestException ex) { return BadRequest(new { message = ex.Message }); }
-        catch (ConflictException ex) { return Conflict(new { message = ex.Message }); }
+      
     }
 
     [HttpGet("api/enrollments/my")]
