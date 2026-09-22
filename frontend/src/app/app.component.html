@@ -7,6 +7,7 @@
   >
     <a routerLink="/courses">Khóa học</a>
     <a routerLink="/my-courses">Khóa học của tôi</a>
+    <a *ngIf="user.role === 'Admin'" routerLink="/admin/dashboard">Dashboard</a>
     <span class="navbar__user">{{ user.fullName }}</span>
     <button type="button" class="btn-secondary" (click)="logout()">
       Đăng xuất
