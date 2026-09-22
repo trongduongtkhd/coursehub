@@ -18,7 +18,7 @@ public static class DependencyInjection
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ITokenService, JwtTokenService>();
         services.AddScoped<IFileStorageService, LocalFileStorageService>();
-
+       services.AddSingleton<ICacheService, MemoryCacheService>();
         return services;
     }
 }

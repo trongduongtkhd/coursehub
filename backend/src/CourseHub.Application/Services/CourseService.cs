@@ -11,12 +11,14 @@ namespace CourseHub.Application.Services;
 public class CourseService : ICourseService
 {
     private readonly IAppDbContext _context;
+    private readonly ICacheService _cache;
 private readonly IFileStorageService _fileStorageService;
 
-    public CourseService(IAppDbContext context, IFileStorageService fileStorageService)
+    public CourseService(IAppDbContext context, IFileStorageService fileStorageService,ICacheService cache)
     {
         _context = context;
         _fileStorageService = fileStorageService;
+        _cache = cache;
     }
 
    public async Task<PagedResult<CourseDto>> GetAllAsync(CourseQueryParameters query)
@@ -64,19 +66,30 @@ private readonly IFileStorageService _fileStorageService;
     };
 }
 
-    public async Task<CourseDto> GetByIdAsync(int id)
+ public async Task<CourseDto> GetByIdAsync(int id)
+{
+    var cacheKey = $"course:{id}";
+    var cached = _cache.Get<CourseDto>(cacheKey);
+    if (cached != null)
     {
-        var course = await _context.Courses
-            .Include(c => c.Instructor)
-            .FirstOrDefaultAsync(c => c.Id == id);
-
-        if (course == null)
-        {
-            throw new NotFoundException("Không tìm thấy khóa học.");
-        }
-
-        return ToDto(course);
+        return cached;
     }
+
+    var course = await _context.Courses
+        .Include(c => c.Instructor)
+        .Include(c => c.Reviews)
+        .FirstOrDefaultAsync(c => c.Id == id);
+
+    if (course == null)
+    {
+        throw new NotFoundException("Không tìm thấy khóa học.");
+    }
+
+    var dto = ToDto(course);
+    _cache.Set(cacheKey, dto, TimeSpan.FromMinutes(5));
+
+    return dto;
+}
 
     public async Task<CourseDto> CreateAsync(CreateCourseRequest request, int instructorId)
     {
@@ -110,6 +123,9 @@ private readonly IFileStorageService _fileStorageService;
         course.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
+       _cache.Remove($"course:{id}");
+
+      
     }
 
     public async Task DeleteAsync(int id, int currentUserId, string currentUserRole)
@@ -123,7 +139,10 @@ private readonly IFileStorageService _fileStorageService;
         EnsureCanModify(course, currentUserId, currentUserRole);
 
         course.IsDeleted = true;
+
         await _context.SaveChangesAsync();
+        _cache.Remove($"course:{id}");
+      
     }
 
     private static void EnsureCanModify(Course course, int currentUserId, string currentUserRole)
@@ -164,7 +183,7 @@ private readonly IFileStorageService _fileStorageService;
     course.ThumbnailUrl = url;
     course.UpdatedAt = DateTime.UtcNow;
     await _context.SaveChangesAsync();
-
+    _cache.Remove($"course:{courseId}");
     return url;
 }
 }
