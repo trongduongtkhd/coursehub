@@ -8,11 +8,15 @@ using Microsoft.OpenApi;
 using CourseHub.API.Middleware;
 using CourseHub.Infrastructure.Persistence;
 using CourseHub.Infrastructure.Persistence.Seed;
+using CourseHub.API.Filters;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ValidationFilter>();
+});
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();

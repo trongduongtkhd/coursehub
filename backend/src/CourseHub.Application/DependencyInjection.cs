@@ -1,7 +1,8 @@
 using CourseHub.Application.Interfaces.Services;
 using CourseHub.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
-
+using FluentValidation;
+using CourseHub.Application.Validators;
 namespace CourseHub.Application;
 
 public static class DependencyInjection
@@ -15,6 +16,7 @@ public static class DependencyInjection
         services.AddScoped<IProgressService, ProgressService>();   
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<IDashboardService, DashboardService>(); 
+        services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
         return services;
     }
 }
