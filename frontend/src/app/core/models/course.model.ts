@@ -7,6 +7,8 @@ export interface Course {
   instructorId: number;
   instructorName: string;
   createdAt: string;
+  averageRating: number;
+  reviewCount: number;
 }
 
 export interface CreateCourseRequest {

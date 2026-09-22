@@ -6,26 +6,49 @@
     >
   </div>
 
-  <p *ngIf="loading">Đang tải...</p>
-
-  <div *ngIf="!loading && courses.length === 0" class="empty-state">
-    Chưa có khóa học nào.
+  <div class="course-filters">
+    <input
+      type="text"
+      [formControl]="searchControl"
+      placeholder="Tìm kiếm khóa học..."
+      class="course-filters__search"
+    />
+    <select [(ngModel)]="statusFilter" (change)="onStatusChange()">
+      <option value="">Tất cả trạng thái</option>
+      <option value="Published">Published</option>
+      <option value="Draft">Draft</option>
+      <option value="Archived">Archived</option>
+    </select>
   </div>
 
-  <div class="course-grid" *ngIf="!loading && courses.length > 0">
-    <a
-      class="card course-card"
-      *ngFor="let course of courses"
-      [routerLink]="['/courses', course.id]"
-    >
+  <p *ngIf="loading">Đang tải...</p>
+
+  <div *ngIf="!loading && result?.items?.length === 0" class="empty-state">
+    Không tìm thấy khóa học nào.
+  </div>
+
+  <div
+    class="course-grid"
+    *ngIf="!loading && result && result.items.length > 0"
+  >
+    <div class="card course-card" *ngFor="let course of result.items">
       <img
         *ngIf="course.thumbnailUrl"
         [src]="course.thumbnailUrl | apiImage"
         class="course-card__thumbnail"
         alt=""
       />
-      <h3>{{ course.title }}</h3>
+      <h3>
+        <a [routerLink]="['/courses', course.id]">{{ course.title }}</a>
+      </h3>
       <p class="description">{{ course.description }}</p>
+      <div class="course-card__rating" *ngIf="course.reviewCount > 0">
+        <app-star-rating
+          [rating]="course.averageRating"
+          [readonly]="true"
+        ></app-star-rating>
+        <span>{{ course.averageRating }} ({{ course.reviewCount }})</span>
+      </div>
       <div class="meta">
         <span>{{ course.instructorName }}</span>
         <span
@@ -34,6 +57,26 @@
           >{{ course.status }}</span
         >
       </div>
-    </a>
+    </div>
+  </div>
+
+  <div class="pagination" *ngIf="result && result.totalPages > 1">
+    <button
+      type="button"
+      class="btn-secondary"
+      [disabled]="currentPage === 1"
+      (click)="goToPage(currentPage - 1)"
+    >
+      ← Trước
+    </button>
+    <span>Trang {{ currentPage }} / {{ result.totalPages }}</span>
+    <button
+      type="button"
+      class="btn-secondary"
+      [disabled]="currentPage === result.totalPages"
+      (click)="goToPage(currentPage + 1)"
+    >
+      Sau →
+    </button>
   </div>
 </div>
