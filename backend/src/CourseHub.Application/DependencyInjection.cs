@@ -13,7 +13,8 @@ public static class DependencyInjection
         services.AddScoped<ILessonService, LessonService>();
         services.AddScoped<IEnrollmentService, EnrollmentService>();
         services.AddScoped<IProgressService, ProgressService>();   
-        services.AddScoped<IReviewService, ReviewService>(); 
+        services.AddScoped<IReviewService, ReviewService>();
+        services.AddScoped<IDashboardService, DashboardService>(); 
         return services;
     }
 }
