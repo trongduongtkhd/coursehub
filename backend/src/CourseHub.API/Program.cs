@@ -9,8 +9,22 @@ using CourseHub.API.Middleware;
 using CourseHub.Infrastructure.Persistence;
 using CourseHub.Infrastructure.Persistence.Seed;
 using CourseHub.API.Filters;
+using Serilog;
+using System.Security.Claims;
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Host.UseSerilog((context, configuration) =>
+{
+    configuration
+        .MinimumLevel.Information()
+        .MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Warning)
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .WriteTo.File(
+            "Logs/coursehub-.log",
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: 14,
+            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}");
+});
 // Add services to the container.
 
 builder.Services.AddControllers(options =>
@@ -70,6 +84,16 @@ builder.Services.AddCors(options =>
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 var app = builder.Build();
+
+app.UseSerilogRequestLogging(options =>
+{
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        diagnosticContext.Set("UserId", userId ?? "anonymous");
+    };
+});
+
 app.UseExceptionHandler();  
 if (app.Environment.IsDevelopment())
 {
