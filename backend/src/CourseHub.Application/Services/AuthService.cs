@@ -5,7 +5,7 @@ using CourseHub.Application.Interfaces.Services;
 using CourseHub.Domain.Entities;
 using CourseHub.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.Extensions.Logging;
 namespace CourseHub.Application.Services;
 
 public class AuthService : IAuthService
@@ -13,12 +13,13 @@ public class AuthService : IAuthService
     private readonly IAppDbContext _context;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
-
-    public AuthService(IAppDbContext context, IPasswordHasher passwordHasher,ITokenService tokenService)
+private readonly ILogger<AuthService> _logger;
+    public AuthService(IAppDbContext context, IPasswordHasher passwordHasher,ITokenService tokenService, ILogger<AuthService> logger)
     {
         _context = context;
         _passwordHasher = passwordHasher;
           _tokenService = tokenService;
+          _logger = logger;
     }
 
     public async Task<UserDto> RegisterAsync(RegisterRequest request)
@@ -51,10 +52,11 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
 {
-    var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+      var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
 
     if (user == null || !_passwordHasher.Verify(request.Password, user.PasswordHash))
     {
+        _logger.LogWarning("Đăng nhập thất bại cho email {Email}", request.Email);
         throw new UnauthorizedException("Email hoặc mật khẩu không đúng.");
     }
 
@@ -68,7 +70,7 @@ public class AuthService : IAuthService
         ExpiresAt = _tokenService.GetRefreshTokenExpiry()
     });
     await _context.SaveChangesAsync();
-
+   _logger.LogInformation("User {UserId} đăng nhập thành công", user.Id);
     return new AuthResponse
     {
         AccessToken = accessToken,

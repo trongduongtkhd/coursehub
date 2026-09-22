@@ -5,30 +5,33 @@ using CourseHub.Application.Interfaces.Services;
 using CourseHub.Domain.Entities;
 using CourseHub.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.Extensions.Logging;
 namespace CourseHub.Application.Services;
 
 public class EnrollmentService : IEnrollmentService
 {
     private readonly IAppDbContext _context;
-
-    public EnrollmentService(IAppDbContext context)
+   private readonly ILogger<EnrollmentService> _logger;
+    public EnrollmentService(IAppDbContext context, ILogger<EnrollmentService> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     public async Task<EnrollmentDto> EnrollAsync(int courseId, int userId)
     {
-        var course = await _context.Courses.Include(c => c.Instructor).FirstOrDefaultAsync(c => c.Id == courseId);
-        if (course == null)
-        {
-            throw new NotFoundException("Không tìm thấy khóa học.");
-        }
+      
+    var course = await _context.Courses.Include(c => c.Instructor).FirstOrDefaultAsync(c => c.Id == courseId);
+    if (course == null)
+    {
+        throw new NotFoundException("Không tìm thấy khóa học.");
+    }
 
-        if (course.Status != CourseStatus.Published)
-        {
-            throw new BadRequestException("Khóa học chưa được xuất bản, không thể đăng ký.");
-        }
+    if (course.Status != CourseStatus.Published)
+    {
+        _logger.LogWarning("User {UserId} cố đăng ký khóa học {CourseId} chưa xuất bản", userId, courseId);
+        throw new BadRequestException("Khóa học chưa được xuất bản, không thể đăng ký.");
+    }
 
         if (course.InstructorId == userId)
         {
@@ -56,7 +59,7 @@ public class EnrollmentService : IEnrollmentService
         }
         catch (DbUpdateException)
         {
-            throw new ConflictException("Bạn đã đăng ký khóa học này rồi.");
+               _logger.LogInformation("User {UserId} đã đăng ký khóa học {CourseId}", userId, courseId);
         }
 
         return new EnrollmentDto
