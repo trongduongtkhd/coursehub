@@ -36,10 +36,7 @@ public class ReviewService : IReviewService
 
     public async Task<ReviewDto> UpsertAsync(int courseId, CreateReviewRequest request, int userId)
     {
-        if (request.Rating < 1 || request.Rating > 5)
-        {
-            throw new BadRequestException("Điểm đánh giá phải từ 1 đến 5.");
-        }
+    
 
         var course = await _context.Courses.FirstOrDefaultAsync(c => c.Id == courseId);
         if (course == null)
