@@ -1,41 +1,30 @@
 using CourseHub.Application.DTOs.Lessons;
 using CourseHub.Application.Exceptions;
-using CourseHub.Application.Interfaces;
+using CourseHub.Application.Interfaces.Repositories;
 using CourseHub.Application.Interfaces.Services;
 using CourseHub.Domain.Entities;
 using CourseHub.Domain.Enums;
-using Microsoft.EntityFrameworkCore;
 
 namespace CourseHub.Application.Services;
 
 public class LessonService : ILessonService
 {
-    private readonly IAppDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public LessonService(IAppDbContext context)
+    public LessonService(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<List<LessonDto>> GetByCourseAsync(int courseId)
     {
-        return await _context.Lessons
-            .Where(l => l.CourseId == courseId)
-            .OrderBy(l => l.OrderIndex)
-            .Select(l => new LessonDto
-            {
-                Id = l.Id,
-                Title = l.Title,
-                Content = l.Content,
-                OrderIndex = l.OrderIndex,
-                CourseId = l.CourseId
-            })
-            .ToListAsync();
+        var lessons = await _unitOfWork.Lessons.GetByCourseAsync(courseId);
+        return lessons.Select(ToDto).ToList();
     }
 
     public async Task<LessonDto> CreateAsync(int courseId, CreateLessonRequest request, int currentUserId, string currentUserRole)
     {
-        var course = await _context.Courses.FirstOrDefaultAsync(c => c.Id == courseId);
+        var course = await _unitOfWork.Courses.GetByIdAsync(courseId);
         if (course == null)
         {
             throw new NotFoundException("Không tìm thấy khóa học.");
@@ -43,10 +32,7 @@ public class LessonService : ILessonService
 
         EnsureCanModify(course, currentUserId, currentUserRole);
 
-        var maxOrder = await _context.Lessons
-            .Where(l => l.CourseId == courseId)
-            .Select(l => (int?)l.OrderIndex)
-            .MaxAsync() ?? 0;
+        var maxOrder = await _unitOfWork.Lessons.GetMaxOrderIndexAsync(courseId);
 
         var lesson = new Lesson
         {
@@ -56,22 +42,15 @@ public class LessonService : ILessonService
             OrderIndex = maxOrder + 1
         };
 
-        _context.Lessons.Add(lesson);
-        await _context.SaveChangesAsync();
+        await _unitOfWork.Lessons.AddAsync(lesson);
+        await _unitOfWork.SaveChangesAsync();
 
-        return new LessonDto
-        {
-            Id = lesson.Id,
-            Title = lesson.Title,
-            Content = lesson.Content,
-            OrderIndex = lesson.OrderIndex,
-            CourseId = lesson.CourseId
-        };
+        return ToDto(lesson);
     }
 
     public async Task UpdateAsync(int lessonId, UpdateLessonRequest request, int currentUserId, string currentUserRole)
     {
-        var lesson = await _context.Lessons.Include(l => l.Course).FirstOrDefaultAsync(l => l.Id == lessonId);
+        var lesson = await _unitOfWork.Lessons.GetWithCourseAsync(lessonId);
         if (lesson == null)
         {
             throw new NotFoundException("Không tìm thấy bài học.");
@@ -83,12 +62,13 @@ public class LessonService : ILessonService
         lesson.Content = request.Content;
         lesson.UpdatedAt = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync();
+        _unitOfWork.Lessons.Update(lesson);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(int lessonId, int currentUserId, string currentUserRole)
     {
-        var lesson = await _context.Lessons.Include(l => l.Course).FirstOrDefaultAsync(l => l.Id == lessonId);
+        var lesson = await _unitOfWork.Lessons.GetWithCourseAsync(lessonId);
         if (lesson == null)
         {
             throw new NotFoundException("Không tìm thấy bài học.");
@@ -96,8 +76,8 @@ public class LessonService : ILessonService
 
         EnsureCanModify(lesson.Course, currentUserId, currentUserRole);
 
-        _context.Lessons.Remove(lesson);
-        await _context.SaveChangesAsync();
+        _unitOfWork.Lessons.Remove(lesson);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     private static void EnsureCanModify(Course course, int currentUserId, string currentUserRole)
@@ -110,4 +90,13 @@ public class LessonService : ILessonService
             throw new ForbiddenException("Bạn không có quyền chỉnh sửa bài học của khóa học này.");
         }
     }
+
+    private static LessonDto ToDto(Lesson l) => new()
+    {
+        Id = l.Id,
+        Title = l.Title,
+        Content = l.Content,
+        OrderIndex = l.OrderIndex,
+        CourseId = l.CourseId
+    };
 }

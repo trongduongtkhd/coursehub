@@ -1,79 +1,63 @@
 using CourseHub.Application.DTOs.Reviews;
 using CourseHub.Application.Exceptions;
-using CourseHub.Application.Interfaces;
-using CourseHub.Application.Interfaces.Services;
+using CourseHub.Application.Interfaces.Repositories;
 using CourseHub.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-
+using CourseHub.Application.Interfaces.Services;
 namespace CourseHub.Application.Services;
 
 public class ReviewService : IReviewService
 {
-    private readonly IAppDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ReviewService(IAppDbContext context)
+    public ReviewService(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<List<ReviewDto>> GetByCourseAsync(int courseId)
     {
-        return await _context.Reviews
-            .Where(r => r.CourseId == courseId)
-            .OrderByDescending(r => r.CreatedAt)
-            .Select(r => new ReviewDto
-            {
-                Id = r.Id,
-                CourseId = r.CourseId,
-                UserId = r.UserId,
-                UserName = r.User.FullName,
-                Rating = r.Rating,
-                Comment = r.Comment,
-                CreatedAt = r.CreatedAt
-            })
-            .ToListAsync();
+        return await _unitOfWork.Reviews.GetByCourseAsync(courseId);
     }
 
     public async Task<ReviewDto> UpsertAsync(int courseId, CreateReviewRequest request, int userId)
     {
-    
-
-        var course = await _context.Courses.FirstOrDefaultAsync(c => c.Id == courseId);
+        var course = await _unitOfWork.Courses.GetByIdAsync(courseId);
         if (course == null)
         {
             throw new NotFoundException("Không tìm thấy khóa học.");
         }
 
-        var isEnrolled = await _context.Enrollments.AnyAsync(e => e.CourseId == courseId && e.UserId == userId);
+        var isEnrolled = await _unitOfWork.Enrollments.ExistsAsync(userId, courseId);
         if (!isEnrolled)
         {
             throw new ForbiddenException("Bạn cần đăng ký khóa học trước khi đánh giá.");
         }
 
-        var review = await _context.Reviews.FirstOrDefaultAsync(r => r.CourseId == courseId && r.UserId == userId);
+        var review = await _unitOfWork.Reviews.GetByUserAndCourseAsync(userId, courseId);
 
         if (review == null)
         {
             review = new Review { CourseId = courseId, UserId = userId, Rating = request.Rating, Comment = request.Comment };
-            _context.Reviews.Add(review);
+            await _unitOfWork.Reviews.AddAsync(review);
         }
         else
         {
             review.Rating = request.Rating;
             review.Comment = request.Comment;
             review.UpdatedAt = DateTime.UtcNow;
+            _unitOfWork.Reviews.Update(review);
         }
 
-        await _context.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
 
-        var user = await _context.Users.FirstAsync(u => u.Id == userId);
+        var user = await _unitOfWork.Users.GetByIdAsync(userId);
 
         return new ReviewDto
         {
             Id = review.Id,
             CourseId = review.CourseId,
             UserId = review.UserId,
-            UserName = user.FullName,
+            UserName = user!.FullName,
             Rating = review.Rating,
             Comment = review.Comment,
             CreatedAt = review.CreatedAt
@@ -82,13 +66,6 @@ public class ReviewService : IReviewService
 
     public async Task<CourseRatingSummaryDto> GetRatingSummaryAsync(int courseId)
     {
-        var query = _context.Reviews.Where(r => r.CourseId == courseId);
-        var count = await query.CountAsync();
-
-        return new CourseRatingSummaryDto
-        {
-            AverageRating = count == 0 ? 0 : Math.Round(await query.AverageAsync(r => r.Rating), 1),
-            ReviewCount = count
-        };
+        return await _unitOfWork.Reviews.GetSummaryAsync(courseId);
     }
 }

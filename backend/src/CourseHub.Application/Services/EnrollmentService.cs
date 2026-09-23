@@ -1,44 +1,44 @@
 using CourseHub.Application.DTOs.Enrollments;
 using CourseHub.Application.Exceptions;
-using CourseHub.Application.Interfaces;
-using CourseHub.Application.Interfaces.Services;
+using CourseHub.Application.Interfaces.Repositories;
 using CourseHub.Domain.Entities;
 using CourseHub.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using CourseHub.Application.Interfaces.Services;
 namespace CourseHub.Application.Services;
 
 public class EnrollmentService : IEnrollmentService
 {
-    private readonly IAppDbContext _context;
-   private readonly ILogger<EnrollmentService> _logger;
-    public EnrollmentService(IAppDbContext context, ILogger<EnrollmentService> logger)
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<EnrollmentService> _logger;
+
+    public EnrollmentService(IUnitOfWork unitOfWork, ILogger<EnrollmentService> logger)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
     public async Task<EnrollmentDto> EnrollAsync(int courseId, int userId)
     {
-      
-    var course = await _context.Courses.Include(c => c.Instructor).FirstOrDefaultAsync(c => c.Id == courseId);
-    if (course == null)
-    {
-        throw new NotFoundException("Không tìm thấy khóa học.");
-    }
+        var course = await _unitOfWork.Courses.GetWithDetailsAsync(courseId);
+        if (course == null)
+        {
+            throw new NotFoundException("Không tìm thấy khóa học.");
+        }
 
-    if (course.Status != CourseStatus.Published)
-    {
-        _logger.LogWarning("User {UserId} cố đăng ký khóa học {CourseId} chưa xuất bản", userId, courseId);
-        throw new BadRequestException("Khóa học chưa được xuất bản, không thể đăng ký.");
-    }
+        if (course.Status != CourseStatus.Published)
+        {
+            _logger.LogWarning("User {UserId} cố đăng ký khóa học {CourseId} chưa xuất bản", userId, courseId);
+            throw new BadRequestException("Khóa học chưa được xuất bản, không thể đăng ký.");
+        }
 
         if (course.InstructorId == userId)
         {
             throw new BadRequestException("Bạn không thể đăng ký khóa học do chính mình giảng dạy.");
         }
 
-        var alreadyEnrolled = await _context.Enrollments.AnyAsync(e => e.UserId == userId && e.CourseId == courseId);
+        var alreadyEnrolled = await _unitOfWork.Enrollments.ExistsAsync(userId, courseId);
         if (alreadyEnrolled)
         {
             throw new ConflictException("Bạn đã đăng ký khóa học này rồi.");
@@ -51,16 +51,18 @@ public class EnrollmentService : IEnrollmentService
             EnrolledAt = DateTime.UtcNow
         };
 
-        _context.Enrollments.Add(enrollment);
+        await _unitOfWork.Enrollments.AddAsync(enrollment);
 
         try
         {
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
         }
         catch (DbUpdateException)
         {
-               _logger.LogInformation("User {UserId} đã đăng ký khóa học {CourseId}", userId, courseId);
+            throw new ConflictException("Bạn đã đăng ký khóa học này rồi.");
         }
+
+        _logger.LogInformation("User {UserId} đã đăng ký khóa học {CourseId}", userId, courseId);
 
         return new EnrollmentDto
         {
@@ -73,22 +75,8 @@ public class EnrollmentService : IEnrollmentService
         };
     }
 
-public async Task<List<EnrollmentDto>> GetMyEnrollmentsAsync(int userId)
-{
-    return await _context.Enrollments
-        .Where(e => e.UserId == userId)
-        .Select(e => new EnrollmentDto
-        {
-            Id = e.Id,
-            CourseId = e.CourseId,
-            CourseTitle = e.Course.Title,
-            CourseThumbnailUrl = e.Course.ThumbnailUrl,
-            InstructorName = e.Course.Instructor.FullName,
-            EnrolledAt = e.EnrolledAt,
-            TotalLessons = e.Course.Lessons.Count(),
-            CompletedLessons = e.Course.Lessons.Count(l => l.Progresses.Any(p => p.UserId == userId && p.IsCompleted))
-        })
-        .OrderByDescending(e => e.EnrolledAt)
-        .ToListAsync();
-}
+    public async Task<List<EnrollmentDto>> GetMyEnrollmentsAsync(int userId)
+    {
+        return await _unitOfWork.Enrollments.GetMyEnrollmentsAsync(userId);
+    }
 }
