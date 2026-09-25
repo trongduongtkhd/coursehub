@@ -37,7 +37,7 @@ public class CourseService : ICourseService
     public async Task<CourseDto> GetByIdAsync(int id)
     {
         var cacheKey = $"course:{id}";
-        var cached = _cache.Get<CourseDto>(cacheKey);
+        var cached = await _cache.GetAsync<CourseDto>(cacheKey);
         if (cached != null)
         {
             return cached;
@@ -50,7 +50,7 @@ public class CourseService : ICourseService
         }
 
         var dto = ToDto(course);
-        _cache.Set(cacheKey, dto, TimeSpan.FromMinutes(5));
+        await _cache.SetAsync(cacheKey, dto, TimeSpan.FromMinutes(5));
 
         return dto;
     }
@@ -89,7 +89,7 @@ public class CourseService : ICourseService
         _unitOfWork.Courses.Update(course);
         await _unitOfWork.SaveChangesAsync();
 
-        _cache.Remove($"course:{id}");
+       await _cache.RemoveAsync($"course:{id}");    
     }
 
     public async Task DeleteAsync(int id, int currentUserId, string currentUserRole)
@@ -106,7 +106,7 @@ public class CourseService : ICourseService
         _unitOfWork.Courses.Update(course);
         await _unitOfWork.SaveChangesAsync();
 
-        _cache.Remove($"course:{id}");
+       await _cache.RemoveAsync($"course:{id}");    
     }
 
     public async Task<string> UpdateThumbnailAsync(int courseId, Stream fileStream, string fileExtension, int currentUserId, string currentUserRole)
@@ -126,7 +126,7 @@ public class CourseService : ICourseService
         _unitOfWork.Courses.Update(course);
         await _unitOfWork.SaveChangesAsync();
 
-        _cache.Remove($"course:{courseId}");
+        await _cache.RemoveAsync($"course:{courseId}"); 
 
         return url;
     }

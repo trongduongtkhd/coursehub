@@ -21,7 +21,22 @@ public static class DependencyInjection
         services.AddScoped<ITokenService, JwtTokenService>();
         services.AddScoped<IFileStorageService, LocalFileStorageService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-       services.AddSingleton<ICacheService, MemoryCacheService>();
+       var redisConnection = configuration.GetConnectionString("Redis");
+
+if (!string.IsNullOrWhiteSpace(redisConnection))
+{
+    services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = redisConnection;
+        options.InstanceName = "CourseHub:";
+    });
+    services.AddSingleton<ICacheService, RedisCacheService>();
+}
+else
+{
+    services.AddMemoryCache();
+    services.AddSingleton<ICacheService, MemoryCacheService>();
+}
         return services;
     }
 }
