@@ -12,7 +12,7 @@ public class GlobalExceptionHandler : IExceptionHandler
     public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHostEnvironment env)
     {
         _logger = logger;
-        _env = env;
+        _env = env;  
     }
 
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)

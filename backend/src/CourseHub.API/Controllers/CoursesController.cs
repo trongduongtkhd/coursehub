@@ -13,7 +13,7 @@ namespace CourseHub.API.Controllers;
 public class CoursesController : ControllerBase
 {
     private readonly ICourseService _courseService;
-private readonly IProgressService _progressService;
+    private readonly IProgressService _progressService;
     public CoursesController(ICourseService courseService, IProgressService progressService)
     {
         _courseService = courseService;
@@ -21,7 +21,7 @@ private readonly IProgressService _progressService;
     }
 
   [HttpGet]
-public async Task<ActionResult<PagedResult<CourseDto>>> GetAll([FromQuery] CourseQueryParameters query)
+  public async Task<ActionResult<PagedResult<CourseDto>>> GetAll([FromQuery] CourseQueryParameters query)
     => Ok(await _courseService.GetAllAsync(query));
 
 [HttpGet("{id}")]

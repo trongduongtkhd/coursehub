@@ -16,3 +16,5 @@ dist/
 # Hệ điều hành
 Thumbs.db
 .DS_Store
+
+backend/src/CourseHub.API/Logs/
