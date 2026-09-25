@@ -19,7 +19,7 @@ public class CourseRepository : Repository<Course>, ICourseRepository
             .Include(c => c.Instructor)
             .Include(c => c.Reviews)
             .FirstOrDefaultAsync(c => c.Id == id);
-    }
+    }    
 
     public async Task<(List<Course> Items, int TotalCount)> GetPagedAsync(CourseQueryParameters query)
     {
@@ -38,10 +38,10 @@ public class CourseRepository : Repository<Course>, ICourseRepository
             courses = courses.Where(c => c.Status == statusEnum);
         }
 
-        if (query.InstructorId.HasValue)
-        {
-            courses = courses.Where(c => c.InstructorId == query.InstructorId.Value);
-        }
+            if (query.InstructorId.HasValue)
+            {
+                courses = courses.Where(c => c.InstructorId == query.InstructorId.Value);
+            }
 
         courses = query.SortBy?.ToLower() switch
         {

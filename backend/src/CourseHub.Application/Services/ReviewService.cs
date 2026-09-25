@@ -8,10 +8,12 @@ namespace CourseHub.Application.Services;
 public class ReviewService : IReviewService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cache;
 
-    public ReviewService(IUnitOfWork unitOfWork)
+    public ReviewService(IUnitOfWork unitOfWork, ICacheService cache)
     {
         _unitOfWork = unitOfWork;
+        _cache = cache;
     }
 
     public async Task<List<ReviewDto>> GetByCourseAsync(int courseId)
@@ -49,6 +51,9 @@ public class ReviewService : IReviewService
         }
 
         await _unitOfWork.SaveChangesAsync();
+
+        // CourseDto chứa AverageRating/ReviewCount nên phải xóa cache chi tiết khóa học
+        _cache.Remove($"course:{courseId}");
 
         var user = await _unitOfWork.Users.GetByIdAsync(userId);
 

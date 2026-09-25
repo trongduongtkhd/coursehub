@@ -7,7 +7,6 @@ namespace CourseHub.API.Filters;
 public class ValidationFilter : IAsyncActionFilter
 {
     private readonly IServiceProvider _serviceProvider;
-
     public ValidationFilter(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
