@@ -1,0 +1,7 @@
+**/bin/
+**/obj/
+**/Logs/
+**/wwwroot/uploads/
+tests/
+.vs/
+*.user
