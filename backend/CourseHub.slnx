@@ -5,4 +5,7 @@
     <Project Path="src/CourseHub.Domain/CourseHub.Domain.csproj" />
     <Project Path="src/CourseHub.Infrastructure/CourseHub.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CourseHub.UnitTests/CourseHub.UnitTests.csproj" />
+  </Folder>
 </Solution>

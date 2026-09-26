@@ -53,7 +53,7 @@ public class ReviewService : IReviewService
         await _unitOfWork.SaveChangesAsync();
 
         // CourseDto chứa AverageRating/ReviewCount nên phải xóa cache chi tiết khóa học
-        _cache.Remove($"course:{courseId}");
+        await _cache.RemoveAsync($"course:{courseId}");
 
         var user = await _unitOfWork.Users.GetByIdAsync(userId);
 

@@ -20,7 +20,8 @@ public class DashboardService : IDashboardService
     {
 
     const string cacheKey = "dashboard:stats";
-    var cached = _cache.Get<DashboardStatsDto>(cacheKey);
+  var cached = await _cache.GetAsync<DashboardStatsDto>(cacheKey);
+
     if (cached != null)
     {
         return cached;
@@ -83,7 +84,7 @@ public class DashboardService : IDashboardService
             EnrollmentsByMonth = enrollmentsByMonth,
             TopCourses = topCourses
         };
-          _cache.Set(cacheKey, result, TimeSpan.FromMinutes(2));
+          await _cache.SetAsync(cacheKey, result, TimeSpan.FromMinutes(2));
           return result;
         
     }

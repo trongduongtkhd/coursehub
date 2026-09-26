@@ -2,7 +2,7 @@ namespace CourseHub.Application.Interfaces.Services;
 
 public interface ICacheService
 {
-    T? Get<T>(string key);
-    void Set<T>(string key, T value, TimeSpan expiration);
-    void Remove(string key);
+    Task<T?> GetAsync<T>(string key);
+    Task SetAsync<T>(string key, T value, TimeSpan expiration);
+    Task RemoveAsync(string key);
 }
