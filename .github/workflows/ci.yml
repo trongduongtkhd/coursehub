@@ -28,3 +28,30 @@ jobs:
 
       - name: Chạy Unit Test
         run: dotnet test backend --no-build --configuration Release
+
+  frontend:
+    name: Frontend - build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Tải code về
+        uses: actions/checkout@v4
+
+      - name: Cài Node 14
+        uses: actions/setup-node@v4
+        with:
+          node-version: "14"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Nâng npm lên bản 8
+        run: npm install -g npm@8
+
+      - name: Cài thư viện
+        run: npm ci
+
+      - name: Build production
+        run: npm run build -- --configuration production
