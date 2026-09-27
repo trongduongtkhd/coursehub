@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend - build & test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Tải code về
+        uses: actions/checkout@v4
+
+      - name: Cài .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore backend
+
+      - name: Build
+        run: dotnet build backend --no-restore --configuration Release
+
+      - name: Chạy Unit Test
+        run: dotnet test backend --no-build --configuration Release
