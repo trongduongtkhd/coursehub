@@ -120,8 +120,14 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await context.Database.MigrateAsync();  
+    await context.Database.MigrateAsync();
+
+    var adminPassword = app.Configuration["Seed:AdminPassword"];
+    var instructorPassword = app.Configuration["Seed:InstructorPassword"];
+    if (string.IsNullOrWhiteSpace(adminPassword) || string.IsNullOrWhiteSpace(instructorPassword))
+        throw new InvalidOperationException("Thiếu cấu hình Seed:AdminPassword hoặc Seed:InstructorPassword.");
+
     var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
-    await DbSeeder.SeedAsync(context, passwordHasher);
+    await DbSeeder.SeedAsync(context, passwordHasher, adminPassword, instructorPassword);
 }
 app.Run();
