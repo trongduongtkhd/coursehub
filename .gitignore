@@ -19,3 +19,5 @@ Thumbs.db
 
 backend/src/CourseHub.API/Logs/
 backend/docker.env
+
+.env.prod
