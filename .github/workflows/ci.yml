@@ -55,8 +55,8 @@ jobs:
 
       - name: Build production
         run: npm run build -- --configuration production
- 
-    publish:
+
+  publish:
     name: CD - Publish Docker images
     needs: [backend, frontend]
     if: github.event_name == 'push'
