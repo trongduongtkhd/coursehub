@@ -45,7 +45,7 @@ export class CourseListComponent implements OnInit {
   }
 
   load(): void {
-    this.loading = true;
+    this.loadinggg = true;
     this.updateUrl();
 
     this.courseService
