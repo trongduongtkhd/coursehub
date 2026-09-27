@@ -7,7 +7,8 @@ namespace CourseHub.Infrastructure.Persistence.Seed;
 
 public static class DbSeeder
 {
-    public static async Task SeedAsync(AppDbContext context, IPasswordHasher passwordHasher)
+    public static async Task SeedAsync(AppDbContext context, IPasswordHasher passwordHasher,
+        string adminPassword, string instructorPassword)
     {
         var seedUsers = new[]
         {
@@ -15,21 +16,21 @@ public static class DbSeeder
             {
                 FullName = "Admin CourseHub",
                 Email = "admin@coursehub.com",
-                PasswordHash = passwordHasher.Hash("Admin@123"),
+                PasswordHash = passwordHasher.Hash(adminPassword),
                 Role = Role.Admin
             },
             new User
             {
                 FullName = "Nguyen Van Instructor",
                 Email = "instructor1@coursehub.com",
-                PasswordHash = passwordHasher.Hash("Instructor@123"),
+                PasswordHash = passwordHasher.Hash(instructorPassword),
                 Role = Role.Instructor
             },
             new User
             {
                 FullName = "Tran Thi Instructor",
                 Email = "instructor2@coursehub.com",
-                PasswordHash = passwordHasher.Hash("Instructor@123"),
+                PasswordHash = passwordHasher.Hash(instructorPassword),
                 Role = Role.Instructor
             }
         };
